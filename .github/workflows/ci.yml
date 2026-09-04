@@ -1,0 +1,57 @@
+name: CI - Validate Part 1 Documents
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Validate Docs Folder
+      run: |
+        if [ -d "docs" ]; then
+          echo "✅ /docs folder exists"
+        else
+          echo "❌ /docs folder not found!"
+          exit 1
+        fi
+    
+    - name: Validate ERD Image
+      run: |
+        if ls docs/*.png docs/*.jpg docs/*.jpeg docs/*.pdf 2>/dev/null | grep -i "erd" > /dev/null; then
+          echo "✅ ERD image found"
+        else
+          echo "❌ ERD image not found in /docs folder!"
+          exit 1
+        fi
+    
+    - name: Validate Endpoint Plan
+      run: |
+        if ls docs/*.md docs/*.pdf 2>/dev/null | grep -i "endpoint" > /dev/null; then
+          echo "✅ Endpoint plan found"
+        else
+          echo "❌ Endpoint plan not found in /docs folder!"
+          exit 1
+        fi
+    
+    - name: Validate SQL Script
+      run: |
+        if ls docs/*.sql 2>/dev/null | grep -i "database" > /dev/null; then
+          echo "✅ SQL script found"
+        else
+          echo "❌ SQL script not found in /docs folder!"
+          exit 1
+        fi
+    
+    - name: Final Success Message
+      run: |
+        echo "🎉 All Part 1 documents validated successfully!"
+        echo "📁 /docs folder contents:"
+        ls -la docs/
