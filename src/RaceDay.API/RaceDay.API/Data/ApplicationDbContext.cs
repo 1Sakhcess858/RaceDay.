@@ -96,6 +96,11 @@ namespace RaceDay.API.Data
             modelBuilder.Entity<Enrolment>()
                 .HasIndex(e => new { e.ParticipantId, e.EventId })
                 .IsUnique();
+
+            // Decimal precision for Distance
+            modelBuilder.Entity<Event>()
+                .Property(e => e.Distance)
+                .HasPrecision(10, 2);
         }
     }
 }
