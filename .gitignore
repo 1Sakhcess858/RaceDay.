@@ -1,9 +1,38 @@
-*/bin/
-*/obj/
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio
+.vs/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# Azure
+*.azurePubxml
+
+# Rider
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
 *.db
-.vs/
-.vscode/
-*.log
+*.mdf
+*.ldf
+
+# Node modules
 node_modules/
