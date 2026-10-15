@@ -101,7 +101,8 @@ namespace RaceDay.API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Distance")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("datetime2");
