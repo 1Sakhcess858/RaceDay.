@@ -50,3 +50,17 @@ RaceDay is a full-stack web-based event management system designed for the South
 
 \## Project Structure
 
+\## Part 2 - RESTful API Development
+
+
+
+\### CI/CD Build Status
+
+!\[CI/CD Build](docs/ci-build-success.png)
+
+
+
+\### Video Presentation
+
+\[Watch Part 2 Walkthrough](https://www.youtube.com/watch?v=YOUR\_VIDEO\_ID)
+
