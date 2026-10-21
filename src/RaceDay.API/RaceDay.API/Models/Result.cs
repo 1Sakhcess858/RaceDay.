@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace RaceDay.API.Models
 {
@@ -16,7 +18,9 @@ namespace RaceDay.API.Models
 
         public int? FinishingPosition { get; set; }
 
-        // Navigation property
-        public Enrolment Enrolment { get; set; } = null!;
+        // 👇 THIS PREVENTS THE VALIDATION ERROR 👇
+        [ValidateNever]
+        [JsonIgnore]
+        public Enrolment? Enrolment { get; set; }
     }
 }

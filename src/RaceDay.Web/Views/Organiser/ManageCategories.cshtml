@@ -1,0 +1,70 @@
+@model RaceDay.Web.DTOs.EventDto
+
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-tags" style="color: #e94560;"></i> Categories for: @Model.Name</h2>
+    <a asp-action="Dashboard" class="btn btn-outline-secondary">Back to Dashboard</a>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Existing Categories</h5>
+                
+                @if (Model.Categories != null && Model.Categories.Any())
+                {
+                    <ul class="list-group">
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>@cat.Name</strong>
+                                    <br /><small class="text-muted">@cat.Description</small>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">No categories yet. Add one using the form on the right.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title mb-3" style="color: #e94560;">Add New Category</h5>
+                
+                <form asp-action="AddCategory" method="post">
+                    <input type="hidden" name="eventId" value="@Model.EventId" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Category Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g., Senior 10km" required />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description (Optional)</label>
+                        <input type="text" name="description" class="form-control" placeholder="e.g., For runners aged 20-39" />
+                    </div>
+
+                    <button type="submit" class="btn text-white w-100" style="background: #e94560;">
+                        Add Category
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

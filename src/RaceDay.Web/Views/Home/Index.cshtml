@@ -1,0 +1,72 @@
+@model List<RaceDay.Web.DTOs.EventDto>
+
+@{
+    ViewData["Title"] = "Home - RaceDay";
+}
+
+<div class="text-center py-5 rounded-4 shadow-sm mb-5" style="background: linear-gradient(135deg, #1a1a2e, #16213e);">
+    <h1 class="display-4 text-white fw-bold">
+        <i class="bi bi-trophy-fill text-warning"></i> Welcome to RaceDay
+    </h1>
+    <p class="lead text-light">South Africa's premier event management platform</p>
+    @if (!ViewBag.IsLoggedIn)
+    {
+        <a href="/Auth/Register" class="btn btn-lg mt-3" style="background: #e94560; color: white;">
+            Get Started
+        </a>
+    }
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold"><i class="bi bi-calendar-event" style="color: #e94560;"></i> Upcoming Events</h2>
+        <hr />
+    </div>
+</div>
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var ev in Model.OrderBy(e => e.EventDate))
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0" style="border-left: 5px solid #e94560 !important;">
+                    @if (!string.IsNullOrEmpty(ev.BannerImageURL))
+                    {
+                        <img src="@ev.BannerImageURL" class="card-img-top" alt="@ev.Name" style="height: 150px; object-fit: cover;" />
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">@ev.Name</h5>
+                        <p class="card-text text-muted small">
+                            @(ev.Description?.Length > 80 ? ev.Description.Substring(0, 80) + "..." : ev.Description)
+                        </p>
+                        <div class="mb-2">
+                            <span class="badge bg-primary">@ev.EventType</span>
+                            <span class="badge bg-success">@ev.Distance km</span>
+                        </div>
+                        <p class="card-text small">
+                            <i class="bi bi-geo-alt" style="color: #e94560;"></i> @ev.Location<br />
+                            <i class="bi bi-calendar3" style="color: #e94560;"></i> @ev.EventDate.ToString("dd MMM yyyy, HH:mm")
+                        </p>
+
+                        <!-- 👇 ADDED ENROL BUTTON HERE 👇 -->
+                        <div class="mt-3">
+                            @if (ViewBag.IsLoggedIn && ViewBag.UserRole == "Participant")
+                            {
+                                <a href="/Participant/EventDetails/@ev.EventId" class="btn text-white w-100" style="background: #e94560;">
+                                    View & Enrol
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info">No upcoming events available.</div>
+        </div>
+    }
+</div>

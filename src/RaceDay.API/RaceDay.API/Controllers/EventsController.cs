@@ -23,9 +23,46 @@ namespace RaceDay.API.Controllers
             var events = await _context.Events
                 .Include(e => e.Organiser)
                 .Include(e => e.Categories)
+                .Include(e => e.Enrolments)
+                    .ThenInclude(en => en.Participant)
+                .Include(e => e.Enrolments)
+                    .ThenInclude(en => en.Category)
+                .Include(e => e.Enrolments)
+                    .ThenInclude(en => en.Result)
                 .OrderBy(e => e.EventDate)
+                .Select(e => new 
+                {
+                    e.EventId,
+                    e.OrganiserId,
+                    e.Name,
+                    e.Description,
+                    e.EventDate,
+                    e.Location,
+                    e.Distance,
+                    e.EventType,
+                    e.BannerImageURL,
+                    e.CreatedAt,
+                    OrganiserName = e.Organiser != null ? e.Organiser.OrganiserName : "Unknown",
+                    Categories = e.Categories,
+                    Enrolments = e.Enrolments.Select(en => new 
+                    {
+                        en.EnrolmentId,
+                        en.ParticipantId,
+                        ParticipantName = en.Participant != null ? (en.Participant.FirstName + " " + en.Participant.LastName) : "Unknown",
+                        en.CategoryId,
+                        CategoryName = en.Category != null ? en.Category.Name : "Unknown",
+                        en.Status,
+                        en.EnrolmentDate,
+                        Result = en.Result != null ? new 
+                        {
+                            en.Result.ResultId,
+                            en.Result.FinishTime,
+                            en.Result.FinishingPosition
+                        } : null
+                    })
+                })
                 .ToListAsync();
-
+            
             return Ok(events);
         }
 
@@ -36,8 +73,44 @@ namespace RaceDay.API.Controllers
                 .Include(e => e.Organiser)
                 .Include(e => e.Categories)
                 .Include(e => e.Enrolments)
-                .ThenInclude(en => en.Participant)
-                .FirstOrDefaultAsync(e => e.EventId == id);
+                    .ThenInclude(en => en.Participant)
+                .Include(e => e.Enrolments)
+                    .ThenInclude(en => en.Category)
+                .Include(e => e.Enrolments)
+                    .ThenInclude(en => en.Result)
+                .Where(e => e.EventId == id)
+                .Select(e => new 
+                {
+                    e.EventId,
+                    e.OrganiserId,
+                    e.Name,
+                    e.Description,
+                    e.EventDate,
+                    e.Location,
+                    e.Distance,
+                    e.EventType,
+                    e.BannerImageURL,
+                    e.CreatedAt,
+                    OrganiserName = e.Organiser != null ? e.Organiser.OrganiserName : "Unknown",
+                    Categories = e.Categories,
+                    Enrolments = e.Enrolments.Select(en => new 
+                    {
+                        en.EnrolmentId,
+                        en.ParticipantId,
+                        ParticipantName = en.Participant != null ? (en.Participant.FirstName + " " + en.Participant.LastName) : "Unknown",
+                        en.CategoryId,
+                        CategoryName = en.Category != null ? en.Category.Name : "Unknown",
+                        en.Status,
+                        en.EnrolmentDate,
+                        Result = en.Result != null ? new 
+                        {
+                            en.Result.ResultId,
+                            en.Result.FinishTime,
+                            en.Result.FinishingPosition
+                        } : null
+                    })
+                })
+                .FirstOrDefaultAsync();
 
             if (eventItem == null)
                 return NotFound($"Event with ID {id} not found.");
@@ -52,16 +125,16 @@ namespace RaceDay.API.Controllers
             var role = HttpContext.Session.GetString("UserRole");
 
             if (string.IsNullOrEmpty(userId))
-                return Unauthorized("You must be logged in.");
+            {
+                userId = Request.Headers["X-UserId"].FirstOrDefault();
+                role = Request.Headers["X-UserRole"].FirstOrDefault();
+            }
 
-            if (role != "Organiser")
-                return Forbid("Only Organisers can create events.");
+            if (string.IsNullOrEmpty(userId)) return Unauthorized("You must be logged in.");
+            if (role != "Organiser") return Forbid("Only Organisers can create events.");
 
-            var organiser = await _context.Organisers
-                .FirstOrDefaultAsync(o => o.OrganiserId == int.Parse(userId));
-
-            if (organiser == null)
-                return BadRequest("Organiser profile not found.");
+            var organiser = await _context.Organisers.FirstOrDefaultAsync(o => o.OrganiserId == int.Parse(userId));
+            if (organiser == null) return BadRequest("Organiser profile not found.");
 
             newEvent.OrganiserId = organiser.OrganiserId;
             newEvent.CreatedAt = DateTime.Now;
@@ -75,26 +148,16 @@ namespace RaceDay.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEvent(int id, [FromBody] Event updatedEvent)
         {
-            if (id != updatedEvent.EventId)
-                return BadRequest("ID mismatch.");
-
+            if (id != updatedEvent.EventId) return BadRequest("ID mismatch.");
+            
             var userId = HttpContext.Session.GetString("UserId");
             var role = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userId)) return Unauthorized("You must be logged in.");
+            if (role != "Organiser") return Forbid("Only Organisers can update events.");
 
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("You must be logged in.");
-
-            if (role != "Organiser")
-                return Forbid("Only Organisers can update events.");
-
-            var existingEvent = await _context.Events
-                .FirstOrDefaultAsync(e => e.EventId == id);
-
-            if (existingEvent == null)
-                return NotFound($"Event with ID {id} not found.");
-
-            if (existingEvent.OrganiserId != int.Parse(userId))
-                return Forbid("You can only update your own events.");
+            var existingEvent = await _context.Events.FirstOrDefaultAsync(e => e.EventId == id);
+            if (existingEvent == null) return NotFound($"Event with ID {id} not found.");
+            if (existingEvent.OrganiserId != int.Parse(userId)) return Forbid("You can only update your own events.");
 
             existingEvent.Name = updatedEvent.Name;
             existingEvent.Description = updatedEvent.Description;
@@ -112,21 +175,12 @@ namespace RaceDay.API.Controllers
         {
             var userId = HttpContext.Session.GetString("UserId");
             var role = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userId)) return Unauthorized("You must be logged in.");
+            if (role != "Organiser") return Forbid("Only Organisers can delete events.");
 
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("You must be logged in.");
-
-            if (role != "Organiser")
-                return Forbid("Only Organisers can delete events.");
-
-            var eventItem = await _context.Events
-                .FirstOrDefaultAsync(e => e.EventId == id);
-
-            if (eventItem == null)
-                return NotFound($"Event with ID {id} not found.");
-
-            if (eventItem.OrganiserId != int.Parse(userId))
-                return Forbid("You can only delete your own events.");
+            var eventItem = await _context.Events.FirstOrDefaultAsync(e => e.EventId == id);
+            if (eventItem == null) return NotFound($"Event with ID {id} not found.");
+            if (eventItem.OrganiserId != int.Parse(userId)) return Forbid("You can only delete your own events.");
 
             _context.Events.Remove(eventItem);
             await _context.SaveChangesAsync();

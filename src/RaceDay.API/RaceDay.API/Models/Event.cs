@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation; // 👈 Add this
 
 namespace RaceDay.API.Models
 {
@@ -33,9 +35,17 @@ namespace RaceDay.API.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Navigation properties
-        public Organiser Organiser { get; set; } = null!;
+        // 👇 ADD [ValidateNever] AND [JsonIgnore] TO PREVENT ERRORS 👇
+        [ValidateNever]
+        [JsonIgnore]
+        public Organiser? Organiser { get; set; }
+        
+        [ValidateNever]
+        [JsonIgnore]
         public ICollection<Category> Categories { get; set; } = new List<Category>();
+        
+        [ValidateNever]
+        [JsonIgnore]
         public ICollection<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
     }
 }

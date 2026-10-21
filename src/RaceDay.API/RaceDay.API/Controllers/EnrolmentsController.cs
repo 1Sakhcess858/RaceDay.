@@ -27,7 +27,7 @@ namespace RaceDay.API.Controllers
                 .Include(e => e.Category)
                 .Include(e => e.Result)
                 .ToListAsync();
-
+            
             return Ok(enrolments);
         }
 
@@ -54,10 +54,10 @@ namespace RaceDay.API.Controllers
         {
             var userId = HttpContext.Session.GetString("UserId");
             var role = HttpContext.Session.GetString("UserRole");
-
+            
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("You must be logged in.");
-
+            
             if (role != "Participant")
                 return Forbid("Only Participants can view their enrolments.");
 
@@ -66,6 +66,23 @@ namespace RaceDay.API.Controllers
                 .Include(e => e.Category)
                 .Include(e => e.Result)
                 .Where(e => e.ParticipantId == int.Parse(userId))
+                .Select(e => new
+                {
+                    e.EnrolmentId,
+                    e.ParticipantId,
+                    e.EventId,
+                    EventName = e.Event != null ? e.Event.Name : "Unknown",
+                    e.CategoryId,
+                    CategoryName = e.Category != null ? e.Category.Name : "Unknown",
+                    e.EnrolmentDate,
+                    e.Status,
+                    Result = e.Result != null ? new
+                    {
+                        e.Result.ResultId,
+                        e.Result.FinishTime,
+                        e.Result.FinishingPosition
+                    } : null
+                })
                 .ToListAsync();
 
             return Ok(enrolments);
@@ -77,16 +94,16 @@ namespace RaceDay.API.Controllers
         {
             var userId = HttpContext.Session.GetString("UserId");
             var role = HttpContext.Session.GetString("UserRole");
-
+            
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("You must be logged in.");
-
+            
             if (role != "Organiser")
                 return Forbid("Only Organisers can view event enrolments.");
 
             var eventItem = await _context.Events
                 .FirstOrDefaultAsync(e => e.EventId == eventId);
-
+            
             if (eventItem == null)
                 return NotFound($"Event with ID {eventId} not found.");
 
@@ -109,28 +126,28 @@ namespace RaceDay.API.Controllers
         {
             var userId = HttpContext.Session.GetString("UserId");
             var role = HttpContext.Session.GetString("UserRole");
-
+            
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("You must be logged in.");
-
+            
             if (role != "Participant")
                 return Forbid("Only Participants can enrol in events.");
 
             var eventItem = await _context.Events
                 .FirstOrDefaultAsync(e => e.EventId == eventId);
-
+            
             if (eventItem == null)
                 return NotFound($"Event with ID {eventId} not found.");
 
             var category = await _context.Categories
                 .FirstOrDefaultAsync(c => c.CategoryId == categoryId && c.EventId == eventId);
-
+            
             if (category == null)
                 return BadRequest("Category not found for this event.");
 
             var existingEnrolment = await _context.Enrolments
                 .FirstOrDefaultAsync(e => e.ParticipantId == int.Parse(userId) && e.EventId == eventId);
-
+            
             if (existingEnrolment != null)
                 return Conflict("You are already enrolled in this event.");
 
@@ -155,10 +172,10 @@ namespace RaceDay.API.Controllers
         {
             var userId = HttpContext.Session.GetString("UserId");
             var role = HttpContext.Session.GetString("UserRole");
-
+            
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("You must be logged in.");
-
+            
             if (role != "Organiser")
                 return Forbid("Only Organisers can update enrolment status.");
 

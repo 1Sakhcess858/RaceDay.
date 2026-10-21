@@ -1,0 +1,82 @@
+﻿@model RaceDay.Web.DTOs.RegisterDto
+
+@{
+    ViewData["Title"] = "Register - RaceDay";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4" style="color: #e94560;">
+                    <i class="bi bi-person-plus"></i> Create an Account
+                </h2>
+
+                @if (!string.IsNullOrEmpty(ViewBag.Error))
+                {
+                    <div class="alert alert-danger">@ViewBag.Error</div>
+                }
+
+                <form asp-action="Register" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FirstName" class="form-label">First Name</label>
+                            <input asp-for="FirstName" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LastName" class="form-label">Last Name</label>
+                            <input asp-for="LastName" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email Address</label>
+                        <input asp-for="Email" class="form-control" type="email" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <input asp-for="Password" class="form-control" type="password" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Role" class="form-label">I am a...</label>
+                        <select asp-for="Role" class="form-select" id="roleSelect" required>
+                            <option value="">-- Select Role --</option>
+                            <option value="Participant">Participant</option>
+                            <option value="Organiser">Organiser</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4" id="organiserFields" style="display: none;">
+                        <label asp-for="OrganiserName" class="form-label">Organiser/Club Name</label>
+                        <input asp-for="OrganiserName" class="form-control" placeholder="e.g., Durban Running Club" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 btn-lg">
+                        Register
+                    </button>
+                </form>
+
+                <hr class="my-4" />
+
+                <p class="text-center mb-0">
+                    Already have an account? <a asp-action="Login" style="color: #e94560;">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('roleSelect').addEventListener('change', function () {
+            var organiserFields = document.getElementById('organiserFields');
+            if (this.value === 'Organiser') {
+                organiserFields.style.display = 'block';
+            } else {
+                organiserFields.style.display = 'none';
+            }
+        });
+    </script>
+}

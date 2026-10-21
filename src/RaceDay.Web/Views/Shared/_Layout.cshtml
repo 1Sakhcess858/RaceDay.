@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RaceDay</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-custom { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+        .navbar-brand { font-weight: bold; color: #e94560 !important; }
+        .nav-link { color: #eee !important; }
+        .nav-link:hover { color: #e94560 !important; }
+        .footer { background: #1a1a2e; color: #aaa; padding: 20px 0; margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <i class="bi bi-trophy"></i> RaceDay
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/"><i class="bi bi-house"></i> Home</a>
+                        </li>
+                        @if (!string.IsNullOrEmpty(Context.Session.GetString("UserId")))
+                        {
+                            @if (Context.Session.GetString("UserRole") == "Organiser")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Organiser/Dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                                </li>
+                            }
+                            else if (Context.Session.GetString("UserRole") == "Participant")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Participant/MyEvents"><i class="bi bi-list-check"></i> My Events</a>
+                                </li>
+                            }
+                        }
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (!string.IsNullOrEmpty(Context.Session.GetString("UserId")))
+                        {
+                            <li class="nav-item">
+                                <span class="navbar-text text-light me-3">
+                                    <i class="bi bi-person-circle"></i> @Context.Session.GetString("UserName")
+                                    <span class="badge bg-secondary">@Context.Session.GetString("UserRole")</span>
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Auth/Logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Auth/Login"><i class="bi bi-box-arrow-in-right"></i> Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Auth/Register"><i class="bi bi-person-plus"></i> Register</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">© 2026 RaceDay - South Africa's Event Management Platform</p>
+        </div>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

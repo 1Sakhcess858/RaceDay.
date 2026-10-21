@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace RaceDay.API.Models
 {
@@ -17,8 +18,11 @@ namespace RaceDay.API.Models
 
         public string? Description { get; set; }
 
-        // Navigation properties
-        public Event Event { get; set; } = null!;
+        // 👇 MUST HAVE [JsonIgnore] TO PREVENT VALIDATION ERRORS 👇
+        [JsonIgnore]
+        public Event? Event { get; set; }
+        
+        [JsonIgnore]
         public ICollection<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
     }
 }

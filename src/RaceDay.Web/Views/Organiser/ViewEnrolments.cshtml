@@ -1,0 +1,69 @@
+@model RaceDay.Web.DTOs.EventDto
+
+@{
+    ViewData["Title"] = "View Enrolments";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-people" style="color: #e94560;"></i> Enrolments for: @Model.Name</h2>
+    <a asp-action="Dashboard" class="btn btn-outline-secondary">Back to Dashboard</a>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Participants</h5>
+        
+        @if (Model.Enrolments != null && Model.Enrolments.Any())
+        {
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var en in Model.Enrolments)
+                    {
+                        <tr>
+                            <td>@en.ParticipantName</td>
+                            <td>@en.CategoryName</td>
+                            <td>
+                                @if (en.Status == "Confirmed") { <span class="badge bg-success">Confirmed</span> }
+                                else if (en.Status == "Pending") { <span class="badge bg-warning text-dark">Pending</span> }
+                                else { <span class="badge bg-info">@en.Status</span> }
+                            </td>
+                            <td>
+                                @if (en.Result == null)
+                                {
+                                    <form asp-action="CaptureResult" method="post" class="d-flex gap-2">
+                                        <input type="hidden" name="enrolmentId" value="@en.EnrolmentId" />
+                                        <input type="hidden" name="eventId" value="@Model.EventId" />
+                                        <input type="text" name="finishTime" placeholder="HH:mm:ss" class="form-control form-control-sm" style="width: 100px;" required />
+                                        <input type="number" name="position" placeholder="Pos" class="form-control form-control-sm" style="width: 80px;" required />
+                                        <button type="submit" class="btn btn-sm btn-primary">Save Result</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-success"><i class="bi bi-check-circle"></i> Result Captured</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-muted">No participants have enrolled yet.</p>
+        }
+    </div>
+</div>
