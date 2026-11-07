@@ -4,7 +4,9 @@ on:
   push:
     branches: [ main, master, part2, part3 ]
   pull_request:
-    branches: [ main, master, part2, part3 ]jobs:
+    branches: [ main, master, part2, part3 ]
+
+jobs:
   build-and-test:
     runs-on: ubuntu-latest
     
