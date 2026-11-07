@@ -142,3 +142,35 @@ To run the MVC application in a Docker container:
 
 5\. Access the application at: http://localhost:8080
 
+\## Part 3 - MVC Web Application
+
+
+
+\### CI/CD Build Status
+
+!\[CI/CD Build](docs/ci-build-success-part3.png)
+
+
+
+\### Docker Instructions
+
+The MVC application is containerized using Docker.
+
+
+
+To run the application in Docker:
+
+1\. Navigate to the MVC project folder: `cd src/RaceDay.Web`
+
+2\. Build the Docker image: `docker build -t raceday-web .`
+
+3\. Run the container: `docker run -d -p 8080:8080 --name raceday-container raceday-web`
+
+4\. Access the application at: `http://localhost:8080`
+
+
+
+\### Video Presentation
+
+\[Watch Part 3 Walkthrough](https://www.youtube.com/watch?v=YOUR\_VIDEO\_ID)
+
