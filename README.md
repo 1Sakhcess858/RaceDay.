@@ -172,5 +172,4 @@ To run the application in Docker:
 
 \### Video Presentation
 
-\[Watch Part 3 Walkthrough](https://www.youtube.com/watch?v=YOUR\_VIDEO\_ID)
-
+[Watch Part 3 Walkthrough](https://youtu.be/25e8rXL-Ync)
